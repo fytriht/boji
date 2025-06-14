@@ -1,0 +1,46 @@
+{
+    "name": "豆伴：豆瓣账号备份工具",
+    "short_name": "豆伴",
+    "author": "豆坟",
+    "version": "0.12.0",
+    "version_name": "0.12.0",
+    "description": "用于备份豆瓣网的用户数据及图片，并支持将备份数据导出到 Excel 文档。现已支持manifest V3 (By wangyeming)。",
+    "manifest_version": 3,
+    "icons": {
+        "16": "images/icon-16x16.png",
+        "32": "images/icon-32x32.png",
+        "48": "images/icon-48x48.png",
+        "128": "images/icon-128x128.png"
+    },
+    "action": {
+        "default_icon": {
+            "16": "images/icon-19x19.png",
+            "32": "images/icon-38x38.png"
+        },
+        "default_title": "豆伴",
+        "default_popup": "popup.html"
+    },
+    "background": {
+        "service_worker": "background.js",
+        "type": "module"
+    },
+    "host_permissions": [
+        "http://*.douban.com/*",
+        "https://*.douban.com/*",
+        "https://*.doubanio.com/*"
+    ],
+    "permissions": [
+        "storage",
+        "cookies",
+        "declarativeNetRequest",
+        "declarativeNetRequestWithHostAccess"
+    ],
+    "web_accessible_resources": [
+        {
+            "resources": ["images/*", "media/*", "index.html"],
+            "matches": ["<all_urls>"]
+        }
+    ],
+    "options_page": "options.html",
+    "homepage_url": "https://doufen.org/"
+}

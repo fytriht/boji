@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0">
+    <title>浏览备份</title>
+    <link rel="shortcut icon" href="images/icon-32x32.png" type="image/png">
+    <link type="text/css" rel="stylesheet" href="vendor/bulma.min.css">
+    <link rel="stylesheet" href="vendor/fontawesome/css/all.min.css">
+    <script src="vendor/zepto.min.js"></script>
+    <style>
+        .account:hover {
+            cursor: pointer;
+            background-color: #f7f7f7;
+        }
+        .container.thin {
+            max-width: 50rem;
+        }
+    </style>
+</head>
+
+<body>
+    <nav class="navbar">
+        <div class="container">
+            <div class="navbar-brand">
+                <a class="navbar-item" href="https://doufen.org/" target="_blank">
+                    <img src="images/logo-main.png" alt="豆伴" title="豆伴">
+                </a>
+                <a role="button" class="navbar-burger">
+                    <span aria-hidden="true"></span>
+                    <span aria-hidden="true"></span>
+                    <span aria-hidden="true"></span>
+                </a>
+            </div>
+            <div class="navbar-menu">
+                <div class="navbar-end">
+                    <div class="navbar-item">
+                        <div class="buttons">
+                            <button class="button" id="backup-db" title="导出豆伴数据库并打包下载">
+                                <span class="icon">
+                                    <i class="fas fa-file-download"></i>
+                                </span>
+                                <span>备份数据库</span>
+                            </button>
+                            <div class="file" style="margin: 0 .5rem .5rem 0;">
+                                <label class="file-label" title="导入备份的数据包">
+                                    <input class="file-input" type="file" id="restore-db" accept=".zip" multiple="false">
+                                    <span class="file-cta" style="background-color: white;">
+                                        <span class="file-icon">
+                                            <i class="fas fa-file-upload"></i>
+                                        </span>
+                                        <span class="file-label">恢复数据库</span>
+                                    </span>
+                                </label>
+                            </div>
+                            <a class="button" href="options.html">
+                                <span class="icon">
+                                    <i class="fas fa-cog"></i>
+                                </span>
+                                <span>设置</span>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+    <script src="./ui/navbar.js"></script>
+
+    <section class="section">
+        <div class="container thin" style="margin: 1rem auto;">
+            <div class="level">
+                <div class="level-left">
+                    <div class="level-item">
+                        <button class="button is-link" id="new-task">
+                            <span class="icon">
+                                <i class="fas fa-plus"></i>
+                            </span>
+                            <span>新建任务</span>
+                        </button>
+                    </div>
+                </div>
+                <div class="level-right">
+                    <div class="level-item">
+                        <button class="button" id="reload">
+                            <span class="icon">
+                                <i class="fas fa-sync"></i>
+                            </span>
+                            <span>刷新</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="container thin" id="accounts">
+            <!-- accounts -->
+        </div>
+    </section>
+
+    <div class="modal" id="task-modal">
+        <div class="modal-background"></div>
+        <div class="modal-card">
+            <header class="modal-card-head">
+                <p class="modal-card-title">新建任务</p>
+                <button class="delete cancel"></button>
+            </header>
+            <section class="modal-card-body">
+                <div class="level">
+                    <div class="level-left">
+                        <div class="level-item">
+                            <label>选择备份的项目：</label>
+                        </div>
+                    </div>
+                    <div class="level-left">
+                        <div class="level-item">
+                            <label class="checkbox">
+                                <input type="checkbox" class="select-all"> 全选
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="columns">
+                    <div class="column">
+                        <div class="field">
+                            <div class="control">
+                                <label class="checkbox">
+                                    <input type="checkbox" name="task" value="Interest"> 影/音/书/游/剧
+                                </label>
+                            </div>
+                        </div>
+                        <div class="field">
+                            <div class="control">
+                                <label class="checkbox">
+                                    <input type="checkbox" name="task" value="Review"> 评论
+                                </label>
+                            </div>
+                        </div>
+                        <div class="field">
+                            <div class="control">
+                                <label class="checkbox">
+                                    <input type="checkbox" name="task" value="Status"> 广播
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="column">
+                        <div class="field">
+                            <div class="control">
+                                <label class="checkbox">
+                                    <input type="checkbox" name="task" value="Following"> 关注
+                                </label>
+                            </div>
+                        </div>
+                        <div class="field">
+                            <div class="control">
+                                <label class="checkbox">
+                                    <input type="checkbox" name="task" value="Follower"> 被关注
+                                </label>
+                            </div>
+                        </div>
+                        <div class="field">
+                            <div class="control">
+                                <label class="checkbox">
+                                    <input type="checkbox" name="task" value="Blacklist"> 黑名单
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="column">
+                        <div class="field">
+                            <div class="control">
+                                <label class="checkbox">
+                                    <input type="checkbox" name="task" value="Note"> 日记
+                                </label>
+                            </div>
+                        </div>
+                        <div class="field">
+                            <div class="control">
+                                <label class="checkbox">
+                                    <input type="checkbox" name="task" value="Photo"> 相册
+                                </label>
+                            </div>
+                        </div>
+                        <div class="field">
+                            <div class="control">
+                                <label class="checkbox">
+                                    <input type="checkbox" name="task" value="Annotation"> 笔记
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="column">
+                        <div class="field">
+                            <div class="control">
+                                <label class="checkbox">
+                                    <input type="checkbox" name="task" value="Doumail"> 豆邮
+                                </label>
+                            </div>
+                        </div>
+                        <div class="field">
+                            <div class="control">
+                                <label class="checkbox">
+                                    <input type="checkbox" name="task" value="Doulist"> 豆列
+                                </label>
+                            </div>
+                        </div>
+                        <div class="field">
+                            <div class="control">
+                                <label class="checkbox">
+                                    <input type="checkbox" name="task" value="Board"> 留言板
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <fieldset class="box">
+                    <legend>高级选项</legend>
+                    <div class="field">
+                        <p class="control">
+                            <label class="checkbox">
+                                <input type="checkbox" class="enable-target-user"> 备份其他用户
+                            </label>
+                        </p>
+                    </div>
+                    <div class="field">
+                        <p class="control">
+                            <input type="text" class="input" name="user-homepage" placeholder="输入用户主页。例如：https://www.douban.com/people/doufen-org/" disabled>
+                        </p>
+                    </div>
+                    <div class="field">
+                        <div class="control">
+                            <label class="checkbox">
+                                <input type="checkbox" name="task" value="Files"> 同步相册、日记、评论以及广播中的图片至 <a href="https://cloudinary.com/" target="_blank">Cloudinary</a>
+                            </label>
+                        </div>
+                    </div>
+                </fieldset>
+                <p class="help">
+                    <span class="icon is-size-6 has-text-danger">
+                        <i class="fas fa-exclamation-triangle"></i>
+                    </span>
+                    <span class="is-size-6 has-text-danger">警告：</span>有部分用户报告，在备份过程中可能会触发豆瓣的反爬虫保护机制，从而导致当前账号被锁定。解锁操作需要使用注册手机发送短信。如果你无法执行解锁操作，请谨慎使用。</p>
+            </section>
+            <footer class="modal-card-foot">
+                <button class="button new is-link">新建</button>
+                <button class="button cancel">取消</button>
+            </footer>
+        </div>
+    </div>
+
+    <div class="modal" id="backup-db-modal">
+        <div class="modal-background"></div>
+        <div class="modal-content">
+            <p class="title has-text-white has-text-centered is-size-5"></p>
+            <progress class="progress is-info" value="0" max="100"></progress>
+        </div>
+    </div>
+
+    <script type="module" src="backup.js"></script>
+</body>
+
+</html>
