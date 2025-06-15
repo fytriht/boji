@@ -1,16 +1,7 @@
 const { ipcRenderer } = require("electron");
 
-// Directly override chrome object since contextIsolation is disabled
 window.chrome = {
-  // test1: () => ipcRenderer.send('test1')
-  // chrome.cookies.getAll
   cookies: {
-    /**
-     * Gets all cookies that match the given filter criteria
-     * @param {Object} options - Filter options for the cookies
-     * @param {string} [options.url] - Optional URL to filter cookies by
-     * @param {function} callback - Callback function to handle the results
-     */
     getAll: (options, callback) => {
       ipcRenderer.invoke("get-all-cookies", options).then(callback);
     },

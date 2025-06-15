@@ -19,29 +19,8 @@ const createWindow = () => {
     },
   });
 
-  ipcMain.on("test1", (event) => {
-    // const webContents = event.sender
-    // const win = BrowserWindow.fromWebContents(webContents)
-    // win.setTitle(title)
-    session.defaultSession.cookies
-      .get({
-        url: "https://www.douban.com",
-      })
-      .then((cookies) => {
-        console.log("@@", cookies);
-      });
-  });
-
-  // Handle get-all-cookies IPC call from preload script
-  ipcMain.handle("get-all-cookies", async (event, options) => {
-    try {
-      const cookies = await session.defaultSession.cookies.get(options || {});
-      console.log("Retrieved cookies:", cookies);
-      return cookies;
-    } catch (error) {
-      console.error("Error getting cookies:", error);
-      throw error;
-    }
+  ipcMain.handle("get-all-cookies", (_, options) => {
+    return session.defaultSession.cookies.get(options || {});
   });
 
   // Modify request headers for douban.com requests (equivalent to chrome.declarativeNetRequest)
