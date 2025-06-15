@@ -59,105 +59,13 @@ window.chrome = {
     },
   },
 
-  // chrome.runtime API mock
   runtime: {
-    /**
-     * Gets the URL for a resource inside the extension
-     * @param {string} path - Path to the resource
-     * @returns {string} Full URL to the resource
-     */
-    getURL: (path) => {
-      // In Electron, we need to construct the URL based on the app's location
-      // Assuming the tofu folder is accessible from the app
-      // const baseUrl = window.location.origin;
-      return path;
-    },
+    getURL: (path) => path,
 
-    /**
-     * Connects to a native application or another part of the extension
-     * @param {Object} connectInfo - Connection information
-     * @returns {Object} Mock port object
-     */
-    connect: (connectInfo) => {
-      console.log("Runtime connect called with:", connectInfo);
-      // Return a mock port object
-      const mockPort = {
-        name: connectInfo?.name || "default",
-        onMessage: {
-          addListener: (callback) => {
-            console.log("Port onMessage listener added");
-            // Store the callback for potential future use
-            mockPort._messageCallback = callback;
-          },
-        },
-        onDisconnect: {
-          addListener: (callback) => {
-            console.log("Port onDisconnect listener added");
-            mockPort._disconnectCallback = callback;
-          },
-        },
-        postMessage: (message) => {
-          console.log("Port postMessage called with:", message);
-          // In a real implementation, this would send the message
-          // For now, we'll just log it
-        },
-        disconnect: () => {
-          console.log("Port disconnect called");
-          if (mockPort._disconnectCallback) {
-            mockPort._disconnectCallback(mockPort);
-          }
-        },
-      };
-      return mockPort;
-    },
-
-    /**
-     * Event fired when the extension is first installed
-     */
-    onInstalled: {
-      addListener: (callback) => {
-        console.log("Runtime onInstalled listener added");
-        // Simulate the installed event
-        setTimeout(() => {
-          callback({ reason: "install" });
-        }, 100);
-      },
-    },
-
-    /**
-     * Event fired when the extension is about to be suspended
-     */
-    onSuspend: {
-      addListener: (callback) => {
-        console.log("Runtime onSuspend listener added");
-        // In Electron, we can listen to app events
-        window.addEventListener("beforeunload", callback);
-      },
-    },
-
-    /**
-     * Event fired when a connection is made from content script or another extension
-     */
     onConnect: {
-      addListener: (callback) => {
-        console.log("Runtime onConnect listener added");
-        // Store the callback for potential future use
-        window._runtimeConnectCallback = callback;
-      },
-    },
-
-    /**
-     * Sends a message to the extension
-     * @param {any} message - Message to send
-     * @param {Function} responseCallback - Optional callback for response
-     */
-    sendMessage: (message, responseCallback) => {
-      console.log("Runtime sendMessage called with:", message);
-      // In Electron, we can simulate this by handling it locally
-      // For now, just call the callback if provided
-      if (responseCallback) {
-        setTimeout(() => responseCallback({ success: true }), 10);
-      }
+      // In electron context, the onConnect related tofu code is not used
+      // so we just need to make sure it will not throw error
+      addListener: () => {},
     },
   },
 
