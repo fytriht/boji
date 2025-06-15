@@ -6,7 +6,6 @@ window.chrome = {
       ipcRenderer.invoke("get-all-cookies", options).then(callback);
     },
   },
-  // chrome.storage.sync API mock using localStorage
   storage: {
     sync: {
       /**
@@ -46,70 +45,20 @@ window.chrome = {
         }
       },
     },
+
     session: {
-      get: (keys, callback) => {
-        console.log("Chrome storage session get called with keys:", keys);
-        // Session storage is temporary, so we'll use sessionStorage
-        const result = {};
-        if (typeof keys === "string") {
-          keys = [keys];
-        }
-        if (Array.isArray(keys)) {
-          keys.forEach((key) => {
-            const value = sessionStorage.getItem(key);
-            if (value !== null) {
-              try {
-                result[key] = JSON.parse(value);
-              } catch (e) {
-                result[key] = value;
-              }
-            }
-          });
-        } else if (typeof keys === "object" && keys !== null) {
-          // keys is an object with default values
-          Object.keys(keys).forEach((key) => {
-            const value = sessionStorage.getItem(key);
-            if (value !== null) {
-              try {
-                result[key] = JSON.parse(value);
-              } catch (e) {
-                result[key] = value;
-              }
-            } else {
-              result[key] = keys[key]; // use default value
-            }
-          });
-        }
-        if (callback) callback(result);
-        return Promise.resolve(result);
+      get: async (key) => {
+        const value = sessionStorage.getItem(key);
+        return { [key]: value !== null ? JSON.parse(value) : null };
       },
-      set: (items, callback) => {
-        console.log("Chrome storage session set called with items:", items);
-        Object.keys(items).forEach((key) => {
-          sessionStorage.setItem(key, JSON.stringify(items[key]));
-        });
-        if (callback) callback();
-        return Promise.resolve();
-      },
-      remove: (keys, callback) => {
-        console.log("Chrome storage session remove called with keys:", keys);
-        if (typeof keys === "string") {
-          keys = [keys];
+      set: async (items) => {
+        for (const [key, value] of Object.entries(items)) {
+          sessionStorage.setItem(key, JSON.stringify(value));
         }
-        keys.forEach((key) => {
-          sessionStorage.removeItem(key);
-        });
-        if (callback) callback();
-        return Promise.resolve();
-      },
-      clear: (callback) => {
-        console.log("Chrome storage session clear called");
-        sessionStorage.clear();
-        if (callback) callback();
-        return Promise.resolve();
       },
     },
   },
+
   // chrome.runtime API mock
   runtime: {
     /**
