@@ -10,35 +10,19 @@ window.chrome = {
   storage: {
     sync: {
       /**
-       * Gets one or more items from storage
-       * @param {string|Array|Object} keys - Keys to retrieve
+       * Gets items from storage
+       * @param {Array} keys - Keys to retrieve
        * @param {function} callback - Callback function to handle the results
        */
       get: (keys, callback) => {
         try {
-          let result = {};
-          if (typeof keys === "string") {
-            // Single key
-            const value = localStorage.getItem(keys);
+          const result = {};
+          for (const key of keys) {
+            const value = localStorage.getItem(key);
             if (value !== null) {
-              result[keys] = JSON.parse(value);
+              result[key] = JSON.parse(value);
             }
-          } else if (Array.isArray(keys)) {
-            // Array of keys
-            keys.forEach((key) => {
-              const value = localStorage.getItem(key);
-              if (value !== null) {
-                result[key] = JSON.parse(value);
-              }
-            });
-          } else if (typeof keys === "object" && keys !== null) {
-            // Object with default values
-            Object.keys(keys).forEach((key) => {
-              const value = localStorage.getItem(key);
-              result[key] = value !== null ? JSON.parse(value) : keys[key];
-            });
           }
-          console.log("Storage sync get:", keys, "->", result);
           setTimeout(() => callback(result), 0); // Async callback
         } catch (error) {
           console.error("Error getting storage data:", error);
@@ -52,10 +36,9 @@ window.chrome = {
        */
       set: (items, callback) => {
         try {
-          Object.keys(items).forEach((key) => {
-            localStorage.setItem(key, JSON.stringify(items[key]));
-          });
-          console.log("Storage sync set:", items);
+          for (const [key, value] of Object.entries(items)) {
+            localStorage.setItem(key, JSON.stringify(value));
+          }
           if (callback) setTimeout(callback, 0); // Async callback
         } catch (error) {
           console.error("Error setting storage data:", error);
