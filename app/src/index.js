@@ -23,50 +23,30 @@ const createWindow = () => {
     return session.defaultSession.cookies.get(options || {});
   });
 
-  // Modify request headers for douban.com requests (equivalent to chrome.declarativeNetRequest)
+  // Modify request headers for douban.com requests (equivalent to chrome.declarativeNetRequest in `background.js`)
   session.defaultSession.webRequest.onBeforeSendHeaders(
     {
       urls: ["*://*.douban.com/*"],
     },
     async (details, callback) => {
-      // Check if this is an XMLHttpRequest
       if (details.resourceType === "xhr") {
-        // Set Referer header
         details.requestHeaders["Referer"] = "https://m.douban.com/";
-        console.log("修改请求头规则已应用到:", details.url);
       }
 
       // Auto-add cookies for douban.com requests
-      try {
-        const cookies = await session.defaultSession.cookies.get({
-          url: details.url,
-        });
-
-        if (cookies.length > 0) {
-          const cookieString = cookies
-            .map((cookie) => `${cookie.name}=${cookie.value}`)
-            .join("; ");
-          details.requestHeaders["Cookie"] = cookieString;
-          console.log(
-            "自动添加cookies到请求:",
-            details.url,
-            "cookies:",
-            cookieString
-          );
-        }
-      } catch (error) {
-        console.error("获取cookies失败:", error);
+      const cookies = await session.defaultSession.cookies.get({
+        url: details.url,
+      });
+      if (cookies.length > 0) {
+        details.requestHeaders["Cookie"] = cookies
+          .map((cookie) => `${cookie.name}=${cookie.value}`)
+          .join("; ");
       }
 
       callback({ requestHeaders: details.requestHeaders });
     }
   );
 
-  // chrome.storage.sync is now handled directly in preload using localStorage
-
-  // and load the test page first to verify Chrome API mocking
-  // mainWindow.loadFile(path.join(__dirname, '../test.html'));
-  // mainWindow.loadFile(path.join(__dirname, '../../tofu/options.html'));
   mainWindow.loadFile(path.join(__dirname, "../../tofu/backup.html"));
 
   // Handle external links - open in default browser instead of Electron
@@ -89,9 +69,6 @@ const createWindow = () => {
   mainWindow.webContents.openDevTools();
 };
 
-// This method will be called when Electron has finished
-// initialization and is ready to create browser windows.
-// Some APIs can only be used after this event occurs.
 app.whenReady().then(() => {
   // Configure session to handle cookies properly
   session.defaultSession.webRequest.onHeadersReceived((details, callback) => {
@@ -135,6 +112,3 @@ app.on("window-all-closed", () => {
     app.quit();
   }
 });
-
-// In this file you can include the rest of your app's specific main process
-// code. You can also put them in separate files and import them here.
