@@ -6,6 +6,8 @@ window.chrome = {
       ipcRenderer.invoke("get-all-cookies", options).then(callback);
     },
   },
+
+  // just mock the implementation that needed
   storage: {
     sync: {
       /**
@@ -68,24 +70,4 @@ window.chrome = {
       addListener: () => {},
     },
   },
-
-  // chrome.declarativeNetRequest API mock (simplified)
-  declarativeNetRequest: {
-    /**
-     * Updates dynamic rules
-     * @param {Object} options - Rule update options
-     * @returns {Promise} Promise that resolves when rules are updated
-     */
-    updateDynamicRules: (options) => {
-      console.log(
-        "DeclarativeNetRequest updateDynamicRules called with:",
-        options
-      );
-      // In Electron, you might want to handle this through the main process
-      // For now, we'll just resolve the promise
-      return Promise.resolve();
-    },
-  },
 };
-
-console.log("Chrome object has been overridden:", window.chrome);
