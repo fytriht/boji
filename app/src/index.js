@@ -1,4 +1,4 @@
-const { app, BrowserWindow, ipcMain, session } = require("electron");
+const { app, BrowserWindow, ipcMain, session, Menu } = require("electron");
 const path = require("node:path");
 
 // Handle creating/removing shortcuts on Windows. (on Windows 10 to disable the shortcut creation, go to Settings > Privacy > General > let apps use advertising ID...)
@@ -69,6 +69,77 @@ const createWindow = () => {
   mainWindow.webContents.openDevTools();
 };
 
+const createMenu = () => {
+  const clearCache = {
+    label: "Clear Cache",
+    click: async () => {
+      try {
+        await session.defaultSession.clearCache();
+        await session.defaultSession.clearStorageData({
+          storages: [
+            "appcache",
+            "cookies",
+            "filesystem",
+            "indexdb",
+            "localstorage",
+            "shadercache",
+            "websql",
+            "serviceworkers",
+            "cachestorage",
+          ],
+        });
+
+        const { dialog } = require("electron");
+        dialog.showMessageBox({
+          type: "info",
+          title: "Cache Cleared",
+          message: "All cache data has been cleared successfully.",
+          buttons: ["OK"],
+        });
+      } catch (error) {
+        const { dialog } = require("electron");
+        dialog.showErrorBox("Error", "Failed to clear cache: " + error.message);
+      }
+    },
+  };
+
+  const template = [];
+  // macOS specific menu adjustments
+  if (process.platform === "darwin") {
+    template.unshift({
+      label: app.getName(),
+      submenu: [
+        { role: "about" },
+        { type: "separator" },
+        clearCache,
+        { type: "separator" },
+        { role: "quit" },
+      ],
+    });
+  } else {
+    template.push({
+      label: "File",
+      submenu: [clearCache],
+    });
+  }
+  template.push({
+    label: "View",
+    submenu: [
+      { role: "reload" },
+      { role: "forceReload" },
+      { role: "toggleDevTools" },
+      { type: "separator" },
+      { role: "resetZoom" },
+      { role: "zoomIn" },
+      { role: "zoomOut" },
+      { type: "separator" },
+      { role: "togglefullscreen" },
+    ],
+  });
+  const menu = Menu.buildFromTemplate(template);
+  Menu.setApplicationMenu(menu);
+};
+
 app.whenReady().then(() => {
   // Configure session to handle cookies properly
   session.defaultSession.webRequest.onHeadersReceived((details, callback) => {
@@ -94,6 +165,7 @@ app.whenReady().then(() => {
   });
 
   createWindow();
+  createMenu(); // Add this line to create the menu
 
   // On OS X it's common to re-create a window in the app when the
   // dock icon is clicked and there are no other windows open.
