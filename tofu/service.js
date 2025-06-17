@@ -101,14 +101,18 @@ export default class Service extends EventTarget {
      * @param {boolean} value
      */
     set debug(value) {
-        if (this._debug === !!value) {
-            let logger = this.logger;
+        const enabled = !!value;
+        this._debug = enabled;
+        const logger = this.logger;
+        if (enabled) {
             logger.level = logger.LEVEL_DEBUG;
             logger.addEventListener('log', event => {
-                let entry = event.detail;
-                let datetime = new Date(entry.time).toISOString();
+                const entry = event.detail;
+                const datetime = new Date(entry.time).toISOString();
                 console.log(`[${datetime}] ${entry.levelName}: ${entry.message}`);
-            })
+            });
+        } else {
+            logger.level = logger.LEVEL_INFO;
         }
     }
 

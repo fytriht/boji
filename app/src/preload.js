@@ -17,13 +17,27 @@ window.chrome = {
        */
       get: (keys, callback) => {
         try {
+          let queryKeys;
+          if (!keys) {
+            queryKeys = Object.keys(localStorage);
+          } else if (typeof keys === "string") {
+            queryKeys = [keys];
+          } else if (Array.isArray(keys)) {
+            queryKeys = keys;
+          } else if (typeof keys === "object") {
+            queryKeys = Object.keys(keys);
+          } else {
+            queryKeys = [];
+          }
+
           const result = {};
-          for (const key of keys) {
+          for (const key of queryKeys) {
             const value = localStorage.getItem(key);
             if (value !== null) {
               result[key] = JSON.parse(value);
             }
           }
+
           setTimeout(() => callback(result), 0); // Async callback
         } catch (error) {
           console.error("Error getting storage data:", error);
